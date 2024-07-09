@@ -59,7 +59,7 @@ func (b *Broker) Start(binder func(s Server, r *mux.Router)) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	repository.SetRepository(repo)
 
 	log.Println("Initializing server on port: ", b.Config().Port)
