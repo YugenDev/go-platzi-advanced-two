@@ -9,7 +9,7 @@ require (
 
 require (
 	github.com/segmentio/ksuid v1.0.4 // indirect
-	golang.org/x/crypto v0.25.0 // indirect
+	golang.org/x/crypto v0.25.0
 )
 
 require (
