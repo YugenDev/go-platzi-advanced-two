@@ -20,7 +20,7 @@ type SignUpResponse struct {
 	Email string `json:"email"`
 }
 
-func SignUpHandler(s *server.Server) http.HandlerFunc {
+func SignUpHandler(s server.Server) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var request = SignUpRequest{}
 		err := json.NewDecoder(r.Body).Decode(&request)
