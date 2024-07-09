@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/YugenDev/go-platzi-advanced-two/models"
+	_ "github.com/lib/pq"
 )
 
 type PostgresRepository struct {
