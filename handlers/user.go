@@ -3,10 +3,12 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/YugenDev/go-platzi-advanced-two/models"
 	"github.com/YugenDev/go-platzi-advanced-two/repository"
 	"github.com/YugenDev/go-platzi-advanced-two/server"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/segmentio/ksuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -23,6 +25,10 @@ type SignUpLoginRequest struct {
 type SignUpResponse struct {
 	Id    string `json:"id"`
 	Email string `json:"email"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
 }
 
 func SignUpHandler(s server.Server) http.HandlerFunc {
@@ -89,7 +95,24 @@ func LoginHandler(s server.Server) http.HandlerFunc {
 			return
 		}
 
-		
+		claim := models.AppClaims{
+			UserId: user.Id,
+			RegisteredClaims: jwt.RegisteredClaims{
+				ExpiresAt: jwt.NewNumericDate(jwt.TimeFunc().Add(24 * time.Hour)),
+			},
+		}
+
+		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
+		tokenString, err := token.SignedString([]byte(s.Config().JWTSecretKey))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("content-type", "application/json")
+		json.NewEncoder(w).Encode(LoginResponse{
+			Token: tokenString,
+		})
 
 	}
 }
