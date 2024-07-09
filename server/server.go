@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/YugenDev/go-platzi-advanced-two/database"
+	"github.com/YugenDev/go-platzi-advanced-two/repository"
 	"github.com/gorilla/mux"
 )
 
@@ -52,6 +54,13 @@ func NewServer(ctx context.Context, config *Config) (*Broker, error) {
 func (b *Broker) Start(binder func(s Server, r *mux.Router)) {
 	b.Router = mux.NewRouter()
 	binder(b, b.Router)
+
+	repo, err := database.NewPostgresRepository(b.ConfigFile.DatabaseURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	
+	repository.SetRepository(repo)
 
 	log.Println("Initializing server on port: ", b.Config().Port)
 	if err := http.ListenAndServe(b.ConfigFile.Port, b.Router); err != nil {
