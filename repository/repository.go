@@ -6,16 +6,16 @@ import (
 	"github.com/YugenDev/go-platzi-advanced-two/models"
 )
 
-type UserRepository interface {
+type Repository interface {
 	InsertUser(ctx context.Context, user *models.User) error
 	GetUserById(ctx context.Context, id string) (*models.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*models.User, error)
 	Close() error
 }
 
-var implementation UserRepository
+var implementation Repository
 
-func SetRepository(repository UserRepository) {
+func SetRepository(repository Repository) {
 	implementation = repository
 }
 
