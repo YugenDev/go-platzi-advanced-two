@@ -169,7 +169,7 @@ func ListPostsHandler(s server.Server) http.HandlerFunc {
 		var err error
 
 		pageStr := r.URL.Query().Get("page")
-		var page int64 = 0
+		var page uint64 = 0
 
 		if pageStr != "" {
 			page, err = strconv.ParseUint(pageStr, 10, 64)
