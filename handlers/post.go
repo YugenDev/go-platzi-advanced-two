@@ -9,6 +9,7 @@ import (
 	"github.com/YugenDev/go-platzi-advanced-two/repository"
 	"github.com/YugenDev/go-platzi-advanced-two/server"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/gorilla/mux"
 	"github.com/segmentio/ksuid"
 )
 
@@ -67,5 +68,19 @@ func InsertPostHandler(s server.Server) http.HandlerFunc {
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+	}
+}
+
+func GetPostByIdHandler(s server.Server) http.HandlerFunc {
+	return func (w http.ResponseWriter, r *http.Request) {
+		params := mux.Vars(r)
+
+		post, err := repository.GetPostById(r.Context(), params["id"])
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+
+		w.Header().Set("content-type", "application/json")
+		json.NewEncoder(w).Encode(post)
 	}
 }
