@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/YugenDev/go-platzi-advanced-two/models"
@@ -160,5 +161,32 @@ func DeletePostHandler(s server.Server) http.HandlerFunc {
 		} else {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
+	}
+}
+
+func ListPostsHandler(s server.Server) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var err error
+
+		pageStr := r.URL.Query().Get("page")
+		var page int64 = 0
+
+		if pageStr != "" {
+			page, err = strconv.ParseUint(pageStr, 10, 64)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+		}
+
+		post, err := repository.ListPosts(r.Context(), uint64(page))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("content-type", "application/json")
+		json.NewEncoder(w).Encode(post)
+
 	}
 }
