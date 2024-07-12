@@ -13,7 +13,7 @@ var upgrader = websocket.Upgrader{
 }
 
 type Hub struct {
-	clients    map[*Client]bool
+	clients    []*Client
 	broadcast  chan []byte
 	unregister chan *Client
 	register   chan *Client
@@ -36,8 +36,48 @@ func (hub *Hub) HandleWebsocket(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
 	}
 
-	client := NewClient(hub, socket) 
+	client := NewClient(hub, socket)
 	hub.register <- client
 
 	go client.Write()
+}
+
+func (hub *Hub) Run() {
+	for {
+		select {
+		case client := <-hub.register:
+			hub.onConnect(client)
+		case client := <-hub.unregister:
+			hub.onDisconnect(client)
+		}
+	}
+}
+
+func (hub *Hub) onConnect(client *Client) {
+	log.Println("Client connected ", client.socket.RemoteAddr())
+
+	hub.mutex.Lock()
+	defer hub.mutex.Unlock()
+
+	client.id = client.socket.RemoteAddr().String()
+	hub.clients = append(hub.clients, client)
+
+}
+
+func (hub *Hub) onDisconnect (client *Client){
+	log.Println("Client disconnected ", client.socket.RemoteAddr())
+	client.socket.Close()
+	hub.mutex.Lock()
+	defer hub.mutex.Unlock()
+	i := -1
+	for j, c := range hub.clients {
+		if c.id == client.id {
+			i = j
+			break
+		}
+	}
+	copy(hub.clients[i:], hub.clients[i+1:])
+	hub.clients[len(hub.clients)-1] = nil
+	hub.clients = hub.clients[:len(hub.clients)-1]
+
 }
