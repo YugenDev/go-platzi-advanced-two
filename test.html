@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Test!</title>
+</head>
+
+<body>
+    <h1>PostApp tester</h1>
+
+</body>
+    <script>
+        fetch("http://localhost:5050/posts", {
+            method: "GET",
+            Headers: {
+                "Content-Type": "application/json",
+                "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+            }
+        }).then(function(response) {
+            return response.json()
+        }).then(function(json){
+            console.log(json)
+        });
+
+    </script>
+</html>
