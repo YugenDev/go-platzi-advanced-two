@@ -16,13 +16,27 @@
             method: "GET",
             Headers: {
                 "Content-Type": "application/json",
-                "Authorization": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+                "Authorization": "token xxxxx"
             }
         }).then(function(response) {
             return response.json()
         }).then(function(json){
             console.log(json)
         });
+
+        var ws = new Websocket("ws:http://localhost:5050/ws");
+
+        ws.onOpen = function() {
+            console.log("succesfully connected to websocket")
+        };
+
+        ws.onmessage = function(event){
+            console.log(event.data)
+        }
+
+        ws.onError = function(event) {
+            console.log("An error ocurred" + event.data)
+        }
 
     </script>
 </html>
