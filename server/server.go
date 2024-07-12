@@ -10,6 +10,7 @@ import (
 	"github.com/YugenDev/go-platzi-advanced-two/repository"
 	"github.com/YugenDev/go-platzi-advanced-two/websocket"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 type Config struct {
@@ -62,6 +63,8 @@ func (b *Broker) Start(binder func(s Server, r *mux.Router)) {
 	b.router = mux.NewRouter()
 	binder(b, b.router)
 
+	handler := cors.AllowAll().Handler(b.router)
+
 	repo, err := database.NewPostgresRepository(b.config.DatabaseURL)
 	if err != nil {
 		log.Fatal(err)
@@ -69,7 +72,7 @@ func (b *Broker) Start(binder func(s Server, r *mux.Router)) {
 	go b.hub.Run()
 	repository.SetRepository(repo)
 	log.Println("starting server on port", b.config.Port)
-	if err := http.ListenAndServe(b.config.Port, b.router); err != nil {
+	if err := http.ListenAndServe(b.config.Port, handler); err != nil {
 		log.Println("error starting server:", err)
 	} else {
 		log.Fatalf("server stopped")
