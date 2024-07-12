@@ -9,7 +9,6 @@ import (
 	"github.com/YugenDev/go-platzi-advanced-two/handlers"
 	"github.com/YugenDev/go-platzi-advanced-two/middleware"
 	"github.com/YugenDev/go-platzi-advanced-two/server"
-	"github.com/YugenDev/go-platzi-advanced-two/websocket"
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
@@ -39,7 +38,6 @@ func main() {
 }
 
 func BindRoutes(s server.Server, r *mux.Router) {
-	hub := websocket.NewHub()
 
 	r.Use(middleware.CheckAuthMiddleware(s))
 
@@ -55,6 +53,5 @@ func BindRoutes(s server.Server, r *mux.Router) {
 	r.HandleFunc("/posts/{id}", handlers.DeletePostHandler(s)).Methods(http.MethodDelete)
 	r.HandleFunc("/posts", handlers.ListPostsHandler(s)).Methods(http.MethodGet)
 
-	go hub.Run()
-	r.HandleFunc("/ws", hub.HandleWebsocket)
+	r.HandleFunc("/ws", s.Hub().HandleWebsocket)
 }
